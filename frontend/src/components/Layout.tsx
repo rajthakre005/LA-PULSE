@@ -39,7 +39,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               Predictive Intelligence
             </div>
           </div>
-          <span className="sidebar-badge">SIH 2026</span>
+
         </div>
         <nav className="sidebar-nav">
           {NAV.map(s => (

@@ -167,7 +167,7 @@ def main():
         "regressor_shap": reg_shap,
         "training_samples": len(df),
         "known_limitations": [
-            "Trained on synthetic data — not validated on real government data.",
+            "Trained on synthetic data - not validated on real government data.",
             "Feature distributions may not match actual acquisition projects.",
             "Model should be retrained with real operational data before deployment.",
         ],
@@ -175,8 +175,8 @@ def main():
     with open("../data/models/model_metadata.json", "w") as f:
         json.dump(metadata, f, indent=2)
 
-    print("\n✓ Models saved to ../data/models/")
-    print("✓ Metadata saved to ../data/models/model_metadata.json")
+    print("\n[OK] Models saved to ../data/models/")
+    print("[OK] Metadata saved to ../data/models/model_metadata.json")
 
 
 if __name__ == "__main__":

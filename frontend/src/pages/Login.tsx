@@ -4,8 +4,8 @@ import { api, setToken } from '../api';
 import { Shield, AlertTriangle } from 'lucide-react';
 
 export default function Login() {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('lapulse2026');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
@@ -36,7 +36,7 @@ export default function Login() {
             </div>
           </div>
         </div>
-        <div className="subtitle">SIH 2026 — Ministry of Rural Development</div>
+
 
         {error && (
           <div style={{ padding: '10px 14px', background: 'var(--red-dim)', border: '1px solid rgba(239,68,68,0.3)',
@@ -61,17 +61,7 @@ export default function Login() {
           </button>
         </form>
 
-        <div style={{ marginTop: '24px', padding: '14px', background: 'var(--bg-elevated)',
-          borderRadius: 'var(--radius)', fontSize: '11px', color: 'var(--text-muted)' }}>
-          <div style={{ fontWeight: 600, marginBottom: '6px', color: 'var(--text-secondary)' }}>Demo Credentials</div>
-          <div>National Admin: <b>admin</b> / lapulse2026</div>
-          <div>State Admin: <b>state_admin</b> / lapulse2026</div>
-          <div>District Officer: <b>dist_officer</b> / lapulse2026</div>
-        </div>
 
-        <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '10px', color: 'var(--text-muted)' }}>
-          Prototype demonstration using synthetic operational data.
-        </div>
       </div>
     </div>
   );
