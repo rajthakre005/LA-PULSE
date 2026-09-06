@@ -37,6 +37,7 @@ export default function ProjectWarRoom() {
       setProject(p); setRisk(r); setTimeline(t); setExplain(e); setInterventions(i);
       setAudit((a.entries || []).filter((x: any) => x.project_id === id));
       setMapData(m);
+      setMapData(m);
     });
   }, [id]);
 

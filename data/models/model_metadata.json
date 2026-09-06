@@ -1,6 +1,6 @@
 {
   "model_version": "1.0.0",
-  "trained_at": "2026-09-04T12:42:22.956895",
+  "trained_at": "2026-09-06T12:56:13.346627",
   "features": [
     "land_area",
     "affected_families",
@@ -97,7 +97,7 @@
   },
   "training_samples": 817,
   "known_limitations": [
-    "Trained on synthetic data \u2014 not validated on real government data.",
+    "Trained on synthetic data - not validated on real government data.",
     "Feature distributions may not match actual acquisition projects.",
     "Model should be retrained with real operational data before deployment."
   ]
