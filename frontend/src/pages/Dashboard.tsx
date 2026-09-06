@@ -163,8 +163,8 @@ export default function Dashboard() {
           <div style={{ height: '400px', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
             <MapContainer center={[22.5, 79]} zoom={5} style={{ height: '100%', width: '100%' }}
               zoomControl={true} scrollWheelZoom={true}>
-              <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                attribution='&copy; OpenStreetMap' />
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; OpenStreetMap contributors' />
               {stateEntries.map(([state, info]) => (
                 <CircleMarker key={state} center={[info.lat, info.lon]}
                   radius={Math.max(8, Math.sqrt(info.total) * 3)}

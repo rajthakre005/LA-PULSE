@@ -271,23 +271,152 @@ a { color: var(--accent); text-decoration: none; }
 
 /* Login */
 .login-page {
-  min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, #0f172a 50%, #1e1b4b 100%);
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #020617 0%, #0f172a 30%, #1e1b4b 60%, #0c1222 100%);
+  position: relative; overflow: hidden;
 }
-.login-card {
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
-  padding: 40px; width: 400px; box-shadow: var(--shadow-lg);
+.login-particles { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.particle {
+  position: absolute; width: 4px; height: 4px; border-radius: 50%;
+  background: rgba(59,130,246,0.3); animation: floatParticle 10s ease-in-out infinite;
 }
-.login-card h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
-.login-card .subtitle { color: var(--text-secondary); font-size: 13px; margin-bottom: 32px; }
+@keyframes floatParticle {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.2; }
+  25% { transform: translateY(-30px) translateX(15px); opacity: 0.6; }
+  50% { transform: translateY(-60px) translateX(-10px); opacity: 0.3; }
+  75% { transform: translateY(-20px) translateX(20px); opacity: 0.5; }
+}
+
+/* Government header */
+.gov-header-strip {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: linear-gradient(90deg, rgba(15,23,42,0.95), rgba(30,27,75,0.95));
+  border-bottom: 1px solid rgba(59,130,246,0.2);
+  padding: 8px 24px; display: flex; align-items: center; justify-content: space-between;
+  backdrop-filter: blur(12px);
+}
+.gov-header-content { display: flex; align-items: center; gap: 10px; }
+.gov-emblem { font-size: 24px; }
+.gov-title { font-size: 13px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.3px; }
+.gov-subtitle { font-size: 10px; color: var(--text-muted); }
+.gov-links { display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--text-muted); }
+
+/* Login container */
+.login-container {
+  display: flex; gap: 32px; align-items: stretch; z-index: 1;
+  margin-top: 48px; padding: 20px;
+}
+
+/* Enhanced login card */
+.login-card-enhanced {
+  background: linear-gradient(145deg, rgba(26,34,52,0.9), rgba(15,23,42,0.95));
+  border: 1px solid rgba(59,130,246,0.2); border-radius: 20px;
+  padding: 32px; width: 440px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 60px rgba(59,130,246,0.08);
+  backdrop-filter: blur(20px); animation: fadeInUp 0.6s ease-out;
+}
+.login-logo-section { text-align: center; margin-bottom: 24px; }
+.login-shield-ring {
+  width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 12px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.2));
+  border: 2px solid rgba(59,130,246,0.4); display: flex; align-items: center; justify-content: center;
+  color: var(--accent); animation: glow 3s ease-in-out infinite;
+}
+.login-brand { font-size: 32px; font-weight: 800; letter-spacing: -1px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.login-tagline { font-size: 12px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+.login-version { font-size: 10px; color: var(--text-muted); margin-top: 6px; background: var(--accent-dim); display: inline-block; padding: 2px 10px; border-radius: 10px; }
+
+/* Stats ribbon */
+.login-stats-ribbon {
+  display: flex; justify-content: center; gap: 20px; padding: 10px 0; margin-bottom: 20px;
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.login-stat { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
+.login-stat strong { color: var(--accent); }
+.login-stat svg { color: var(--accent); }
+
+/* Error */
+.login-error {
+  padding: 10px 14px; background: var(--red-dim); border: 1px solid rgba(239,68,68,0.3);
+  border-radius: var(--radius); display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--red); margin-bottom: 16px; animation: fadeInUp 0.3s ease;
+}
+
+/* Input with icon */
+.input-with-icon { position: relative; }
+.input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; z-index: 1; }
+.input-with-icon .form-input { padding-left: 38px; }
+
+/* Login button */
+.login-btn {
+  width: 100%; justify-content: center; margin-top: 8px; font-size: 15px; padding: 12px 24px;
+  background: linear-gradient(135deg, #3b82f6, #6366f1); border: none; position: relative; overflow: hidden;
+}
+.login-btn:hover { background: linear-gradient(135deg, #2563eb, #4f46e5); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(59,130,246,0.4); }
+.login-spinner {
+  width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+  border-radius: 50%; display: inline-block; animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Demo section */
+.login-demo-section { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+.login-demo-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; text-align: center; }
+.login-demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.login-demo-chip {
+  padding: 8px 10px; border-radius: var(--radius); border: 1px solid var(--border); cursor: pointer;
+  transition: all var(--transition); text-align: center;
+}
+.login-demo-chip:hover { border-color: var(--accent); background: var(--accent-dim); }
+.demo-role { display: block; font-size: 10px; color: var(--text-muted); font-weight: 600; }
+.demo-user { display: block; font-size: 12px; color: var(--text-primary); font-weight: 700; margin-top: 2px; }
+
+/* Data source */
+.login-source {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin-top: 16px; font-size: 9px; color: var(--text-muted); opacity: 0.7;
+}
+
+/* Feature cards */
+.login-features { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 280px; }
+.login-feature-card {
+  background: rgba(26,34,52,0.7); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; text-align: center; transition: all 0.3s ease;
+  backdrop-filter: blur(8px); animation: fadeInUp 0.5s ease-out backwards;
+}
+.login-feature-card:nth-child(1) { animation-delay: 0.1s; }
+.login-feature-card:nth-child(2) { animation-delay: 0.2s; }
+.login-feature-card:nth-child(3) { animation-delay: 0.3s; }
+.login-feature-card:nth-child(4) { animation-delay: 0.4s; }
+.login-feature-card:hover { border-color: rgba(59,130,246,0.4); transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.feature-icon { font-size: 24px; display: block; margin-bottom: 8px; }
+.feature-title { font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.feature-desc { font-size: 10px; color: var(--text-muted); line-height: 1.4; }
+
+/* Login footer */
+.login-footer {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  padding: 8px 24px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 10px; color: var(--text-muted); background: rgba(10,14,26,0.8); backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(42,54,80,0.5);
+}
+
+/* Form elements */
 .form-group { margin-bottom: 16px; }
 .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
 .form-input {
   width: 100%; padding: 10px 14px; background: var(--bg-elevated); border: 1px solid var(--border);
   border-radius: var(--radius); color: var(--text-primary); font-size: 14px; font-family: inherit;
-  outline: none; transition: border-color var(--transition);
+  outline: none; transition: all var(--transition);
 }
-.form-input:focus { border-color: var(--accent); }
+.form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+.form-input::placeholder { color: var(--text-muted); }
+
+@media (max-width: 800px) {
+  .login-container { flex-direction: column; align-items: center; }
+  .login-features { width: 100%; max-width: 440px; }
+  .gov-header-strip { flex-direction: column; gap: 4px; text-align: center; }
+}
 
 /* Grid layouts */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

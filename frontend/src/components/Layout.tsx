@@ -64,8 +64,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
         <div className="sidebar-footer">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span>Prototype Demo</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
             <span onClick={() => { clearToken(); nav('/login'); }}
               style={{ cursor: 'pointer', color: 'var(--red)', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <LogOut size={14} /> Logout
@@ -80,7 +79,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             Land Acquisition Predictive Early-Warning & Intervention Engine
           </div>
           <div className="topbar-right">
-            <div className="demo-badge">Prototype — Synthetic Data</div>
           </div>
         </div>
         <div className="page-content">{children}</div>

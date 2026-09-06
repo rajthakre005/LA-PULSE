@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import ReactECharts from 'echarts-for-react';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
-import { ArrowLeft, Zap, AlertTriangle, FileText, Users, MapPin, Brain, Activity } from 'lucide-react';
+import { ArrowLeft, Zap, AlertTriangle, Users, MapPin, Brain } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
 function getRiskClass(s: number) { return s >= 76 ? 'critical' : s >= 51 ? 'high' : s >= 26 ? 'moderate' : 'low'; }
@@ -25,15 +25,18 @@ export default function ProjectWarRoom() {
   const [audit, setAudit] = useState<any[]>([]);
   const [simMode, setSimMode] = useState<'intervention' | 'custom'>('intervention');
   const [customParams, setCustomParams] = useState({ legal_disputes_resolved: 0, verification_boost: 0, compensation_boost: 0 });
+  const [mapData, setMapData] = useState<any>(null);
 
   useEffect(() => {
     if (!id) return;
     Promise.all([
       api.getProject(id), api.getProjectRisk(id), api.getProjectTimeline(id),
       api.getExplainability(id), api.getInterventions(id), api.getAudit(),
-    ]).then(([p, r, t, e, i, a]) => {
+      api.getMapData(id),
+    ]).then(([p, r, t, e, i, a, m]) => {
       setProject(p); setRisk(r); setTimeline(t); setExplain(e); setInterventions(i);
       setAudit((a.entries || []).filter((x: any) => x.project_id === id));
+      setMapData(m);
     });
   }, [id]);
 
@@ -243,20 +246,26 @@ export default function ProjectWarRoom() {
           <div className="card">
             <div className="card-title" style={{ marginBottom: '12px' }}>Project Map — Critical Villages</div>
             <div style={{ height: '400px', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
-              <MapContainer center={[project.latitude, project.longitude]} zoom={11} style={{ height: '100%', width: '100%' }}>
-                <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" attribution="&copy; OSM" />
-                {(project.villages || []).map((v: any) => {
-                  const vRisk = Math.round(100 - v.verification_pct * 30 - v.compensation_pct * 30 - v.rr_progress_pct * 20 + v.disputes * 2);
-                  return (
-                    <CircleMarker key={v.village_id} center={[v.latitude, v.longitude]} radius={Math.max(6, v.disputes + 4)}
-                      pathOptions={{ fillColor: getRiskColor(vRisk), fillOpacity: 0.7, color: getRiskColor(vRisk), weight: 2 }}>
-                      <Popup><div style={{ fontFamily: 'Inter', fontSize: '12px' }}>
-                        <strong>{v.name}</strong><br />Risk: {vRisk}%<br />Parcels: {v.total_parcels}<br />Disputes: {v.disputes}<br />Verification: {(v.verification_pct * 100).toFixed(0)}%
-                      </div></Popup>
-                    </CircleMarker>
-                  );
-                })}
-              </MapContainer>
+              {mapData ? (
+                <MapContainer center={mapData.center} zoom={11} style={{ height: '100%', width: '100%' }}>
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
+                  {(mapData.villages || []).map((v: any) => {
+                    const vRisk = Math.round(100 - v.verification_pct * 30 - v.compensation_pct * 30 - v.rr_progress_pct * 20 + v.disputes * 2);
+                    return (
+                      <CircleMarker key={v.village_id} center={[v.latitude, v.longitude]} radius={Math.max(6, v.disputes + 4)}
+                        pathOptions={{ fillColor: getRiskColor(vRisk), fillOpacity: 0.7, color: getRiskColor(vRisk), weight: 2 }}>
+                        <Popup><div style={{ fontFamily: 'Inter', fontSize: '12px' }}>
+                          <strong>{v.name}</strong><br />Risk: {vRisk}%<br />Parcels: {v.total_parcels}<br />Disputes: {v.disputes}<br />Verification: {(v.verification_pct * 100).toFixed(0)}%
+                        </div></Popup>
+                      </CircleMarker>
+                    );
+                  })}
+                </MapContainer>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)' }}>
+                  Loading map data...
+                </div>
+              )}
             </div>
           </div>
           <div className="card">
@@ -266,7 +275,7 @@ export default function ProjectWarRoom() {
             <table className="data-table">
               <thead><tr><th>Village</th><th>Parcels</th><th>Disputes</th><th>Verify</th><th>Comp</th><th>Risk</th></tr></thead>
               <tbody>
-                {(project.villages || []).sort((a: any, b: any) => b.disputes - a.disputes).slice(0, 12).map((v: any) => {
+                {(mapData?.villages || project.villages || []).sort((a: any, b: any) => b.disputes - a.disputes).slice(0, 12).map((v: any) => {
                   const vRisk = Math.round(100 - v.verification_pct * 30 - v.compensation_pct * 30 - v.rr_progress_pct * 20 + v.disputes * 2);
                   return (
                     <tr key={v.village_id}>
