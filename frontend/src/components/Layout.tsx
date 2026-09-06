@@ -3,7 +3,7 @@ import { clearToken, api } from '../api';
 import { useState, useEffect } from 'react';
 import {
   LayoutDashboard, Bell, Brain, LogOut, Shield,
-  BarChart3, FileText
+  BarChart3, FileText, TrendingUp
 } from 'lucide-react';
 
 const NAV = [
@@ -16,6 +16,7 @@ const NAV = [
     { path: '/documents', icon: FileText, label: 'Document Intelligence' },
   ]},
   { section: 'AI/ML', items: [
+    { path: '/predict', icon: TrendingUp, label: 'New Project Prediction' },
     { path: '/model', icon: Brain, label: 'Model Metrics' },
   ]},
 ];

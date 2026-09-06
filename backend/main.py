@@ -10,6 +10,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from jose import jwt, JWTError
 import hashlib
+from predictor import get_predictor
 
 # ── Config ──
 SECRET_KEY = os.getenv("SECRET_KEY", "lapulse-secret-key-change-in-production")
@@ -352,6 +353,58 @@ def model_metrics():
     if not MODEL_META:
         return {"status": "no_model", "message": "Model not yet trained."}
     return {**MODEL_META, "disclaimer": "Prototype demonstration using synthetic operational data."}
+
+
+# ── ML Prediction Endpoint ──
+class PredictionRequest(BaseModel):
+    land_area: float
+    affected_families: int
+    num_parcels: int
+    num_villages: int
+    notification_pct: float
+    survey_pct: float
+    verification_pct: float
+    objection_pct: float
+    award_pct: float
+    compensation_pct: float
+    rr_pct: float
+    possession_pct: float
+    overall_completion: float
+    legal_disputes: int
+    comp_total: float
+    comp_paid: float
+    comp_pending: float
+    avg_response_days: float
+    approval_delay: int
+    docs_total: int
+    docs_pending: int
+    doc_anomalies: int
+    velocity_change: float
+    project_value: float
+
+
+@app.post("/predict")
+def predict(request: PredictionRequest):
+    """Make ML prediction for a new project."""
+    try:
+        predictor = get_predictor()
+        features = request.dict()
+        result = predictor.predict(features)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/predict/explain")
+def predict_with_explanation(request: PredictionRequest):
+    """Make ML prediction with SHAP explanation."""
+    try:
+        predictor = get_predictor()
+        features = request.dict()
+        result = predictor.predict_with_shap(features)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ── Audit Log ──
 @app.get("/audit")

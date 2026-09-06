@@ -10,6 +10,7 @@ import AlertCenter from './pages/AlertCenter';
 import ModelMetrics from './pages/ModelMetrics';
 import Analytics from './pages/Analytics';
 import DocumentIntelligence from './pages/DocumentIntelligence';
+import Prediction from './pages/Prediction';
 import './index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -34,6 +35,7 @@ export default function App() {
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/documents" element={<DocumentIntelligence />} />
                 <Route path="/model" element={<ModelMetrics />} />
+                <Route path="/predict" element={<Prediction />} />
               </Routes>
             </Layout>
           </ProtectedRoute>

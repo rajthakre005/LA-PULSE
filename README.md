@@ -61,9 +61,43 @@ npm run dev
 ```bash
 cd ml
 pip install -r requirements.txt
-python data_generator.py
-python train.py
+python data_generator.py        # Generate training data (817 projects)
+python generate_test_data.py    # Generate test data (200 projects)
+python train.py                 # Train models on training data only
+python evaluate.py              # Evaluate on unseen test data
+python data_integrity_check.py  # Validate train/test separation
 ```
+
+## 📊 Dataset
+
+The ML pipeline uses a strict train/test split to ensure proper model evaluation:
+
+- **Training Data:** 817 projects (training_data.csv) - Used ONLY for training
+- **Test Data:** 200 projects (test_data.csv) - Used ONLY for final evaluation
+- **Total:** 1,017 projects
+
+### Train/Test Separation
+
+- Training data uses project IDs starting with `LA-*`
+- Test data uses project IDs starting with `TEST-*` to clearly distinguish
+- No overlap between training and test project IDs
+- Models are trained ONLY on training_data.csv
+- Evaluation is performed ONLY on test_data.csv
+- This prevents data leakage and ensures realistic performance estimates
+
+### Evaluation Metrics
+
+**Classification (Delay Prediction):**
+- Accuracy, Precision, Recall, F1-score, ROC-AUC, Confusion Matrix
+
+**Regression (Delay Days & Risk Score):**
+- MAE (Mean Absolute Error), RMSE (Root Mean Square Error), R²
+
+### Live Prediction
+
+The system provides runtime prediction for new projects via:
+- `POST /predict` - Get risk score, delay probability, and expected delay
+- `POST /predict/explain` - Get predictions with SHAP feature explanations
 
 ## 📁 Project Structure
 

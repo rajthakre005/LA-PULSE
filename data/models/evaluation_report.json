@@ -1,59 +1,59 @@
 {
-  "evaluation_timestamp": "2026-09-06T12:56:18.833165",
+  "evaluation_timestamp": "2026-09-06T18:47:05.628058",
   "model_version": "1.0.0",
   "test_samples": 200,
   "test_results": {
     "classifier": {
-      "accuracy": 0.87,
-      "precision": 0.7333,
-      "recall": 0.7021,
-      "f1": 0.7174,
-      "auc": 0.9469
+      "accuracy": 0.875,
+      "precision": 0.72,
+      "recall": 0.766,
+      "f1": 0.7423,
+      "auc": 0.9447
     },
     "classifier_confusion_matrix": [
       [
-        141,
-        12
+        139,
+        14
       ],
       [
-        14,
-        33
+        11,
+        36
       ]
     ],
     "delay_regressor": {
-      "mae": 9.08,
-      "rmse": 10.71,
-      "r2": 0.7265
+      "mae": 9.26,
+      "rmse": 10.7,
+      "r2": 0.7266
     },
     "risk_regressor": {
-      "mae": 5.31,
-      "rmse": 6.49,
-      "r2": 0.7393
+      "mae": 5.28,
+      "rmse": 6.4,
+      "r2": 0.747
     }
   },
   "training_metrics": {
     "classifier": {
-      "accuracy": 0.9207,
-      "precision": 0.8571,
-      "recall": 0.875,
-      "f1": 0.866
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
     },
     "delay_regressor": {
-      "mae": 9.28,
-      "rmse": 11.0,
-      "r2": 0.7389
+      "mae": 0.23,
+      "rmse": 0.31,
+      "r2": 0.9998
     },
     "risk_regressor": {
-      "mae": 5.63,
-      "rmse": 6.72,
-      "r2": 0.7793
+      "mae": 0.85,
+      "rmse": 1.04,
+      "r2": 0.9947
     }
   },
   "performance_comparison": {
-    "classifier_f1_diff": -0.1486,
-    "classifier_accuracy_diff": -0.0507,
-    "regressor_mae_diff": -0.2,
-    "risk_mae_diff": -0.32
+    "classifier_f1_diff": -0.2577,
+    "classifier_accuracy_diff": -0.125,
+    "regressor_mae_diff": 9.03,
+    "risk_mae_diff": 4.43
   },
   "data_split": {
     "training_samples": 817,

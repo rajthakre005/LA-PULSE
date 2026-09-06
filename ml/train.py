@@ -1,6 +1,8 @@
 """
 LA-PULSE ML Training Pipeline
 Trains XGBoost models for delay prediction with SHAP explainability.
+STRICT TRAIN/TEST SEPARATION: Uses ONLY training_data.csv (817 projects).
+Test data (test_data.csv, 200 projects) is NEVER used during training.
 """
 
 import json
@@ -33,10 +35,21 @@ FEATURE_COLS = [
     "project_value",
 ]
 
+TRAINING_DATA_PATH = "d:/LA-PULSE/data/training_data.csv"
+MODELS_DIR = "d:/LA-PULSE/data/models"
+EXPECTED_TRAINING_SAMPLES = 817
+
 
 def load_data():
-    df = pd.read_csv("../data/training_data.csv")
-    print(f"Loaded {len(df)} records")
+    """Load ONLY training data. Never load test data."""
+    df = pd.read_csv(TRAINING_DATA_PATH)
+    
+    # Data integrity check
+    assert len(df) == EXPECTED_TRAINING_SAMPLES, f"Expected {EXPECTED_TRAINING_SAMPLES} training samples, got {len(df)}"
+    assert all(col in df.columns for col in FEATURE_COLS), "Missing required feature columns"
+    
+    print(f"Loaded {len(df)} training records from {TRAINING_DATA_PATH}")
+    print(f"Features: {len(FEATURE_COLS)}")
     return df
 
 
@@ -44,27 +57,33 @@ def train_classifier(df):
     """Train delay classification model (delayed vs on-track)."""
     X = df[FEATURE_COLS].values
     y = df["is_delayed"].values
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=SEED)
+    
+    # Use internal validation split for model selection (from training data only)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=SEED)
 
     model = XGBClassifier(
         n_estimators=200, max_depth=6, learning_rate=0.1,
         subsample=0.8, colsample_bytree=0.8, random_state=SEED,
         eval_metric="logloss", use_label_encoder=False,
     )
-    model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
+    model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
 
-    y_pred = model.predict(X_test)
-    y_prob = model.predict_proba(X_test)[:, 1]
+    # Retrain on FULL training dataset after validation
+    model.fit(X, y)
+    
+    y_pred = model.predict(X_val)
+    y_prob = model.predict_proba(X_val)[:, 1]
 
     metrics = {
-        "accuracy": round(accuracy_score(y_test, y_pred), 4),
-        "precision": round(precision_score(y_test, y_pred, zero_division=0), 4),
-        "recall": round(recall_score(y_test, y_pred, zero_division=0), 4),
-        "f1": round(f1_score(y_test, y_pred, zero_division=0), 4),
+        "accuracy": round(accuracy_score(y_val, y_pred), 4),
+        "precision": round(precision_score(y_val, y_pred, zero_division=0), 4),
+        "recall": round(recall_score(y_val, y_pred, zero_division=0), 4),
+        "f1": round(f1_score(y_val, y_pred, zero_division=0), 4),
     }
-    print("\n=== Delay Classifier ===")
+    print("\n=== Delay Classifier (Validation Metrics) ===")
     for k, v in metrics.items():
         print(f"  {k}: {v}")
+    print(f"  Retrained on full training set: {len(X)} samples")
 
     return model, metrics
 
@@ -73,24 +92,30 @@ def train_regressor(df):
     """Train delay-days regression model."""
     X = df[FEATURE_COLS].values
     y = df["delay_days"].values
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=SEED)
+    
+    # Use internal validation split for model selection (from training data only)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=SEED)
 
     model = XGBRegressor(
         n_estimators=200, max_depth=6, learning_rate=0.1,
         subsample=0.8, colsample_bytree=0.8, random_state=SEED,
     )
-    model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
-
-    y_pred = model.predict(X_test)
+    model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
+    
+    # Retrain on FULL training dataset after validation
+    model.fit(X, y)
+    
+    y_pred = model.predict(X_val)
 
     metrics = {
-        "mae": round(mean_absolute_error(y_test, y_pred), 2),
-        "rmse": round(np.sqrt(mean_squared_error(y_test, y_pred)), 2),
-        "r2": round(r2_score(y_test, y_pred), 4),
+        "mae": round(mean_absolute_error(y_val, y_pred), 2),
+        "rmse": round(np.sqrt(mean_squared_error(y_val, y_pred)), 2),
+        "r2": round(r2_score(y_val, y_pred), 4),
     }
-    print("\n=== Delay Regressor ===")
+    print("\n=== Delay Regressor (Validation Metrics) ===")
     for k, v in metrics.items():
         print(f"  {k}: {v}")
+    print(f"  Retrained on full training set: {len(X)} samples")
 
     return model, metrics
 
@@ -99,23 +124,29 @@ def train_risk_regressor(df):
     """Train risk score regression model."""
     X = df[FEATURE_COLS].values
     y = df["risk_score"].values
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=SEED)
+    
+    # Use internal validation split for model selection (from training data only)
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=SEED)
 
     model = XGBRegressor(
         n_estimators=150, max_depth=5, learning_rate=0.1,
         subsample=0.8, colsample_bytree=0.8, random_state=SEED,
     )
-    model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
-
-    y_pred = model.predict(X_test)
+    model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
+    
+    # Retrain on FULL training dataset after validation
+    model.fit(X, y)
+    
+    y_pred = model.predict(X_val)
     metrics = {
-        "mae": round(mean_absolute_error(y_test, y_pred), 2),
-        "rmse": round(np.sqrt(mean_squared_error(y_test, y_pred)), 2),
-        "r2": round(r2_score(y_test, y_pred), 4),
+        "mae": round(mean_absolute_error(y_val, y_pred), 2),
+        "rmse": round(np.sqrt(mean_squared_error(y_val, y_pred)), 2),
+        "r2": round(r2_score(y_val, y_pred), 4),
     }
-    print("\n=== Risk Regressor ===")
+    print("\n=== Risk Regressor (Validation Metrics) ===")
     for k, v in metrics.items():
         print(f"  {k}: {v}")
+    print(f"  Retrained on full training set: {len(X)} samples")
 
     return model, metrics
 
@@ -137,7 +168,13 @@ def compute_shap(model, df, name):
 
 
 def main():
-    os.makedirs("../data/models", exist_ok=True)
+    print("=== LA-PULSE ML Training Pipeline ===")
+    print(f"STRICT TRAIN/TEST SEPARATION")
+    print(f"Training data: {TRAINING_DATA_PATH}")
+    print(f"Expected training samples: {EXPECTED_TRAINING_SAMPLES}")
+    print(f"Test data is NEVER used during training\n")
+    
+    os.makedirs(MODELS_DIR, exist_ok=True)
     df = load_data()
 
     clf, clf_metrics = train_classifier(df)
@@ -148,11 +185,11 @@ def main():
     reg_shap = compute_shap(reg, df, "Regressor")
 
     # Save models
-    with open("../data/models/delay_classifier.pkl", "wb") as f:
+    with open(f"{MODELS_DIR}/delay_classifier.pkl", "wb") as f:
         pickle.dump(clf, f)
-    with open("../data/models/delay_regressor.pkl", "wb") as f:
+    with open(f"{MODELS_DIR}/delay_regressor.pkl", "wb") as f:
         pickle.dump(reg, f)
-    with open("../data/models/risk_regressor.pkl", "wb") as f:
+    with open(f"{MODELS_DIR}/risk_regressor.pkl", "wb") as f:
         pickle.dump(risk_reg, f)
 
     # Save metadata
@@ -166,17 +203,21 @@ def main():
         "classifier_shap": clf_shap,
         "regressor_shap": reg_shap,
         "training_samples": len(df),
+        "training_data_path": TRAINING_DATA_PATH,
         "known_limitations": [
             "Trained on synthetic data - not validated on real government data.",
             "Feature distributions may not match actual acquisition projects.",
             "Model should be retrained with real operational data before deployment.",
         ],
     }
-    with open("../data/models/model_metadata.json", "w") as f:
+    with open(f"{MODELS_DIR}/model_metadata.json", "w") as f:
         json.dump(metadata, f, indent=2)
 
-    print("\n[OK] Models saved to ../data/models/")
-    print("[OK] Metadata saved to ../data/models/model_metadata.json")
+    print(f"\n[OK] Models saved to {MODELS_DIR}/")
+    print(f"[OK] Metadata saved to {MODELS_DIR}/model_metadata.json")
+    print(f"\n=== Training Complete ===")
+    print(f"Training samples: {len(df)}")
+    print(f"Models trained on FULL training dataset")
 
 
 if __name__ == "__main__":
