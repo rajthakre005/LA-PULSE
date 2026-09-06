@@ -147,9 +147,9 @@ export default function Dashboard() {
         </div>
         <div className="stat-card info">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <span className="stat-label">Compensation Pending (₹ Lakhs)</span>
+            <span className="stat-label">Compensation Pending (₹)</span>
           </div>
-          <div className="stat-value" style={{ fontSize: '22px' }}>{Math.round(data.compensation_pending_total).toLocaleString()}</div>
+          <div className="stat-value" style={{ fontSize: '22px' }}>₹{(data.compensation_pending_total / 1000).toFixed(2)} Crore</div>
         </div>
       </div>
 
